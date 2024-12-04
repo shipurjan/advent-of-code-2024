@@ -18,9 +18,7 @@ function getSimilarityScore(left: number[], right: number[]) {
     throw new Error("Wrong data - both lists should be of the same size");
   }
 
-  const intersection = [...new Set(left).intersection(new Set(right))];
-
-  return intersection.reduce(
+  return [...new Set(left).intersection(new Set(right))].reduce(
     (prev, cur) => (prev + cur * right.filter((e) => e === cur).length),
     0,
   );
