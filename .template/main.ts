@@ -8,6 +8,7 @@ console.log(await computeAnswer(data));
 // ___________________________________ //
 
 async function computeAnswer(file: Deno.FsFile) {
+  void file;
   return await Promise.resolve(null);
 }
 
