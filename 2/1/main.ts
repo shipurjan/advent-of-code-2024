@@ -8,10 +8,7 @@ console.log(await computeAnswer(data));
 
 // ___________________________________ //
 
-declare const _brand: unique symbol;
-export type IBrand<T, TBrand> = T & { [_brand]: TBrand };
-
-type IReport = IBrand<number[], "Report">;
+type IReport = number[];
 
 async function computeAnswer(file: Deno.FsFile) {
   const readable = file.readable
@@ -52,7 +49,7 @@ function meetsRules(growing: boolean, a: number, b?: number) {
 }
 
 function getReport(line: string): IReport {
-  return line.split(" ").map(Number) as IReport;
+  return line.split(" ").map(Number);
 }
 
 async function openFile(filename: string) {

@@ -8,10 +8,7 @@ console.log(await computeAnswer(data));
 
 // ___________________________________ //
 
-declare const _brand: unique symbol;
-export type IBrand<T, TBrand> = T & { [_brand]: TBrand };
-
-type IReport = IBrand<number[], "Report">;
+type IReport = number[];
 
 async function computeAnswer(file: Deno.FsFile) {
   const readable = file.readable
@@ -27,10 +24,10 @@ async function computeAnswer(file: Deno.FsFile) {
 }
 
 function isDampenedSafe(report: IReport): boolean {
-  if (!isSafe(Array.from(report) as IReport)) {
+  if (!isSafe(Array.from(report))) {
     let index = report.length - 1;
     while (index >= 0) {
-      const newReport = report.toSpliced(index, 1) as IReport;
+      const newReport = report.toSpliced(index, 1);
       if (isSafe(newReport)) return true;
       index = index - 1;
     }
@@ -66,7 +63,7 @@ function meetsRules(growing: boolean, a: number, b?: number) {
 }
 
 function getReport(line: string): IReport {
-  return line.split(" ").map(Number) as IReport;
+  return line.split(" ").map(Number);
 }
 
 async function openFile(filename: string) {
