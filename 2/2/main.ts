@@ -58,7 +58,7 @@ function meetsRules(growing: boolean, a: number, b?: number) {
 
   if (Math.abs(delta) > maxDiff) return false;
 
-  return growing ? 0 < delta : 0 > delta;
+  return growing ? delta > 0 : 0 > delta;
 }
 
 function getReport(line: string): IReport {
