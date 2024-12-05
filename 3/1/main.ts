@@ -3,7 +3,7 @@ import * as path from 'jsr:@std/path'
 // ___________________________________ //
 
 const data = await readTextFile('data.txt')
-console.log(await computeAnswer(data))
+console.log(computeAnswer(data))
 
 // ___________________________________ //
 
