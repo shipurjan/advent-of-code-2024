@@ -3,8 +3,8 @@ import { TextLineStream } from 'jsr:@std/streams'
 
 // ___________________________________ //
 
-const data = await openFile('data.txt')
-console.log(await computeAnswer(data))
+const file = await openFile('data.txt')
+console.log(await computeAnswer(file))
 
 // ___________________________________ //
 

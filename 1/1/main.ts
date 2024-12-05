@@ -2,8 +2,8 @@ import * as path from 'jsr:@std/path'
 
 // ___________________________________ //
 
-const data = await openFile('data.txt')
-console.log(await computeAnswer(data))
+const file = await openFile('data.txt')
+console.log(await computeAnswer(file))
 
 // ___________________________________ //
 
