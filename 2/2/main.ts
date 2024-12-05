@@ -24,17 +24,16 @@ async function computeAnswer(file: Deno.FsFile) {
 }
 
 function isDampenedSafe(report: IReport): boolean {
-  if (!isSafe(Array.from(report))) {
-    let index = report.length - 1;
-    while (index >= 0) {
-      const newReport = report.toSpliced(index, 1);
-      if (isSafe(newReport)) return true;
-      index = index - 1;
-    }
-    return false;
+  if (isSafe(Array.from(report))) return true;
+
+  let index = report.length - 1;
+  while (index >= 0) {
+    const newReport = report.toSpliced(index, 1);
+    if (isSafe(newReport)) return true;
+    index -= 1;
   }
 
-  return true;
+  return false;
 }
 
 function isSafe(report: IReport): boolean {
