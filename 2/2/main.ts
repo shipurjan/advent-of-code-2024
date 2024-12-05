@@ -1,72 +1,72 @@
-import * as path from "jsr:@std/path";
-import { TextLineStream } from "jsr:@std/streams";
+import * as path from 'jsr:@std/path'
+import { TextLineStream } from 'jsr:@std/streams'
 
 // ___________________________________ //
 
-const data = await openFile("data.txt");
-console.log(await computeAnswer(data));
+const data = await openFile('data.txt')
+console.log(await computeAnswer(data))
 
 // ___________________________________ //
 
-type IReport = number[];
+type IReport = number[]
 
 async function computeAnswer(file: Deno.FsFile) {
   const readable = file.readable
     .pipeThrough(new TextDecoderStream())
-    .pipeThrough(new TextLineStream());
+    .pipeThrough(new TextLineStream())
 
-  let count = 0;
+  let count = 0
   for await (const line of readable) {
-    const report = getReport(line);
-    if (isDampenedSafe(report)) count += 1;
+    const report = getReport(line)
+    if (isDampenedSafe(report)) count += 1
   }
-  return count;
+  return count
 }
 
 function isDampenedSafe(report: IReport): boolean {
-  if (isSafe(Array.from(report))) return true;
+  if (isSafe(Array.from(report))) return true
 
-  let index = report.length - 1;
+  let index = report.length - 1
   while (index >= 0) {
-    const newReport = report.toSpliced(index, 1);
-    if (isSafe(newReport)) return true;
-    index -= 1;
+    const newReport = report.toSpliced(index, 1)
+    if (isSafe(newReport)) return true
+    index -= 1
   }
 
-  return false;
+  return false
 }
 
 function isSafe(report: IReport): boolean {
-  let lastEl;
-  const growing = isGrowing(report);
+  let lastEl
+  const growing = isGrowing(report)
   while ((lastEl = report.pop())) {
-    if (!meetsRules(growing, lastEl, report.at(-1))) return false;
+    if (!meetsRules(growing, lastEl, report.at(-1))) return false
   }
-  return true;
+  return true
 }
 
 function isGrowing([a, b, ..._]: IReport): boolean {
-  return a < b;
+  return a < b
 }
 
 function meetsRules(growing: boolean, a: number, b?: number) {
-  if (!b) return true;
-  if (a === b) return false;
+  if (!b) return true
+  if (a === b) return false
 
-  const maxDiff = 3;
-  const delta = a - b;
+  const maxDiff = 3
+  const delta = a - b
 
-  if (Math.abs(delta) > maxDiff) return false;
+  if (Math.abs(delta) > maxDiff) return false
 
-  return growing ? delta > 0 : 0 > delta;
+  return growing ? delta > 0 : 0 > delta
 }
 
 function getReport(line: string): IReport {
-  return line.split(" ").map(Number);
+  return line.split(' ').map(Number)
 }
 
 async function openFile(filename: string) {
-  const dirname = import.meta.dirname;
-  if (!dirname) throw new Error("Dirname is not defined for some reason");
-  return await Deno.open(path.join(dirname, filename));
+  const dirname = import.meta.dirname
+  if (!dirname) throw new Error('Dirname is not defined for some reason')
+  return await Deno.open(path.join(dirname, filename))
 }

@@ -1,19 +1,19 @@
-import * as path from "jsr:@std/path";
+import * as path from 'jsr:@std/path'
 
 // ___________________________________ //
 
-const data = await openFile("data.txt");
-console.log(await computeAnswer(data));
+const data = await openFile('data.txt')
+console.log(await computeAnswer(data))
 
 // ___________________________________ //
 
 async function computeAnswer(file: Deno.FsFile) {
-  void file;
-  return await Promise.resolve(null);
+  void file
+  return await Promise.resolve(null)
 }
 
 async function openFile(filename: string) {
-  const dirname = import.meta.dirname;
-  if (!dirname) throw new Error("Dirname is not defined for some reason");
-  return await Deno.open(path.join(dirname, filename));
+  const dirname = import.meta.dirname
+  if (!dirname) throw new Error('Dirname is not defined for some reason')
+  return await Deno.open(path.join(dirname, filename))
 }
