@@ -1,3 +1,4 @@
+import { TextLineStream } from 'jsr:@std/streams'
 import * as path from 'jsr:@std/path'
 
 // ___________________________________ //
@@ -8,8 +9,13 @@ console.log(await computeAnswer(data))
 // ___________________________________ //
 
 async function computeAnswer(file: Deno.FsFile) {
-  void file
-  return await Promise.resolve(null)
+  const readable = file.readable
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough(new TextLineStream())
+
+  for await (const line of readable) {
+    console.log(line)
+  }
 }
 
 async function openFile(filename: string) {
