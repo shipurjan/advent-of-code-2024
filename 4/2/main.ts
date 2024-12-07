@@ -1,11 +1,11 @@
 import { TextLineStream } from 'jsr:@std/streams'
 import * as path from 'jsr:@std/path'
 
-const SEARCH_WORD = 'XMAS'
+const SEARCH_WORD = 'MAS'
 
 // ___________________________________ //
 
-const data = await openFile('data.txt')
+const data = await openFile('data.sample.txt')
 console.log(await computeAnswer(data))
 
 // ___________________________________ //
@@ -19,6 +19,14 @@ export type Axes = {
   minorDiagonal: Axis
 }
 
+type DiagMatch = {
+  direction: 'major' | 'minor'
+  diagIndex: number
+  index: number
+  input: string
+  aIndex: number
+}
+
 async function computeAnswer(file: Deno.FsFile) {
   const size = await getWordSearchSize(file)
   const readable = file.readable
@@ -26,22 +34,47 @@ async function computeAnswer(file: Deno.FsFile) {
     .pipeThrough(new TextLineStream())
 
   const axes = await getAxes(readable, size)
-  return Object.values(axes).reduce(
-    (prev, cur) =>
-      prev +
-      cur.reduce(
-        (p, c) =>
-          p +
-          (c.matchAll(
-            new RegExp(
-              `(?=${SEARCH_WORD}|${[...SEARCH_WORD].reverse().join('')})`,
-              'g',
-            ),
-          ).toArray().length ?? 0),
-        0,
+  const masMatches = findMasMatches(axes)
+  return getXMAScount(masMatches)
+}
+
+function getXMAScount(masMatches: DiagMatch[]) {
+  console.debug({ masMatches })
+}
+
+function getMinorIndexCrossingThrough(
+  majorIndex: number,
+  aIndex: number,
+  size: number,
+) {
+  return 2 * aIndex + Math.abs(1 + majorIndex - size)
+}
+
+function findMasMatches(
+  axes: Axes,
+) {
+  const getDiagMatches = (
+    s: string,
+    diagIndex: number,
+    direction: DiagMatch['direction'],
+  ): DiagMatch[] =>
+    [...s.matchAll(
+      new RegExp(
+        `(?=${SEARCH_WORD}|${[...SEARCH_WORD].reverse().join('')})`,
+        'g',
       ),
-    0,
-  )
+    )].map(({ groups: _, index, input }) => ({
+      direction,
+      diagIndex,
+      index,
+      input,
+      aIndex: index + 1,
+    }))
+
+  return [
+    ...axes.majorDiagonal.flatMap((d, i) => getDiagMatches(d, i, 'major')),
+    ...axes.minorDiagonal.flatMap((d, i) => getDiagMatches(d, i, 'minor')),
+  ]
 }
 
 export async function getAxes(
@@ -74,7 +107,7 @@ export async function getAxes(
     }
 
     const getLetterAt = (x: number, y: number) => {
-      return axes.horizontal?.[x]?.[y] ?? undefined
+      return axes.horizontal?.[x]?.[y]
     }
 
     const getDiagonalLength = (x: number) =>
