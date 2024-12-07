@@ -17,7 +17,6 @@ This word search allows words to be horizontal, vertical, diagonal, written back
     .A..A.
     XMAS.S
     .X....
-    
 
 The actual word search will be full of letters instead. For example:
 
@@ -31,7 +30,6 @@ The actual word search will be full of letters instead. For example:
     SAXAMASAAA
     MAMMMXMMMM
     MXMXAXMASX
-    
 
 In this word search, `XMAS` occurs a total of _`18`_ times; here's the same word search again, but where letters not involved in any `XMAS` have been replaced with `.`:
 
@@ -45,6 +43,5 @@ In this word search, `XMAS` occurs a total of _`18`_ times; here's the same word
     .A.A.A.A.A
     ..M.M.M.MM
     .X.X.XMASX
-    
 
 Take a look at the little Elf's word search. _How many times does `XMAS` appear?_
