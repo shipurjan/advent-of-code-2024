@@ -74,7 +74,7 @@ export async function getAxes(
     }
 
     const getLetterAt = (x: number, y: number) => {
-      return axes.horizontal?.[x]?.[y] ?? undefined
+      return axes.horizontal?.[x]?.[y]
     }
 
     const getDiagonalLength = (x: number) =>
