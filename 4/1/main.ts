@@ -1,6 +1,8 @@
 import { TextLineStream } from 'jsr:@std/streams'
 import * as path from 'jsr:@std/path'
 
+const SEARCH_WORD = 'XMAS'
+
 // ___________________________________ //
 
 const data = await openFile('data.txt')
@@ -24,12 +26,18 @@ async function computeAnswer(file: Deno.FsFile) {
     .pipeThrough(new TextLineStream())
 
   const axes = await getAxes(readable, size)
-  console.debug({ axes })
   return Object.values(axes).reduce(
     (prev, cur) =>
       prev +
       cur.reduce(
-        (p, c) => p + (c.matchAll(/(?=XMAS|SAMX)/g).toArray().length ?? 0),
+        (p, c) =>
+          p +
+          (c.matchAll(
+            new RegExp(
+              `(?=${SEARCH_WORD}|${[...SEARCH_WORD].reverse().join('')})`,
+              'g',
+            ),
+          ).toArray().length ?? 0),
         0,
       ),
     0,
