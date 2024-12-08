@@ -39,6 +39,7 @@ async function computeAnswer(file: Deno.FsFile) {
 }
 
 function getXMAScount(masMatches: DiagMatch[], size: number) {
+  const map = getYHashMap(size)
   let count = 0
   const [major, minor] = bifilter(masMatches, (m) => m.direction === 'major')
   for (const mj of major) {
@@ -51,15 +52,19 @@ function getXMAScount(masMatches: DiagMatch[], size: number) {
     const common = minor.filter((mn) => mn.diagIndex === sharedMinorIndex)
     if (!common.length) continue
 
-    if (common.some((mn) => isSameLocation(mj, mn, size))) {
+    if (common.some((mn) => isSameLocation(mj, mn, size, map))) {
       count += 1
     }
   }
   return count
 }
 
-function isSameLocation(mj: DiagMatch, mn: DiagMatch, size: number) {
-  const map = getYHashMap(size)
+function isSameLocation(
+  mj: DiagMatch,
+  mn: DiagMatch,
+  size: number,
+  map: Record<number, [number, number][]>,
+) {
   const x = mj.diagIndex + 1
   const y = mj.aIndex
   const mnDiagIndex = 2 * y + Math.abs(size - x)
