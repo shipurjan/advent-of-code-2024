@@ -5,7 +5,7 @@ const SEARCH_WORD = 'MAS'
 
 // ___________________________________ //
 
-const data = await openFile('data.sample.txt')
+const data = await openFile('data.txt')
 console.log(await computeAnswer(data))
 
 // ___________________________________ //
@@ -35,11 +35,74 @@ async function computeAnswer(file: Deno.FsFile) {
 
   const axes = await getAxes(readable, size)
   const masMatches = findMasMatches(axes)
-  return getXMAScount(masMatches)
+  return getXMAScount(masMatches, size)
 }
 
-function getXMAScount(masMatches: DiagMatch[]) {
-  console.debug({ masMatches })
+function getXMAScount(masMatches: DiagMatch[], size: number) {
+  let count = 0
+  const [major, minor] = bifilter(masMatches, (m) => m.direction === 'major')
+  for (const mj of major) {
+    const sharedMinorIndex = getMinorIndexCrossingThrough(
+      mj.diagIndex,
+      mj.aIndex,
+      size,
+    )
+
+    const common = minor.filter((mn) => mn.diagIndex === sharedMinorIndex)
+    if (!common.length) continue
+
+    if (common.some((mn) => isSameLocation(mj, mn, size))) {
+      count += 1
+    }
+  }
+  return count
+}
+
+function isSameLocation(mj: DiagMatch, mn: DiagMatch, size: number) {
+  const map = getYHashMap(size)
+  const x = mj.diagIndex + 1
+  const y = mj.aIndex
+  const mnDiagIndex = 2 * y + Math.abs(size - x)
+  const mnAIndex = (() => {
+    const [result] = Object.entries(map).find(([, inputs]) =>
+      inputs.some(([X, Y]) => x === X && y === Y)
+    )!
+    return Number(result)
+  })()
+  return mnDiagIndex === mn.diagIndex && mnAIndex === mn.aIndex
+}
+
+function getYHashMap(size: number) {
+  const triangleArr: [number, number][][] = []
+  for (let i = 0; i < size * 2; i++) {
+    triangleArr.push([])
+    for (let j = 0; j < -Math.abs(i - size) + size; j++) {
+      triangleArr[i - 1].push([i, j])
+    }
+  }
+  triangleArr.pop()
+
+  const squareArr: [number, number][][] = []
+  for (let i = 0; i < size; i++) {
+    squareArr.push([])
+    for (let j = 0; j < size; j++) {
+      const el = triangleArr[j]?.pop()
+      if (!el) throw new Error('el not found')
+      squareArr[i].push(el)
+    }
+    if (!triangleArr.at(0)?.length) triangleArr.shift()
+  }
+
+  const map: Record<number, [number, number][]> = {}
+  for (let i = 0; i < size; i++) {
+    const firstRow = squareArr.shift() ?? []
+    const firstElements = squareArr.reduce(
+      (prev, _cur, i) => [...prev, squareArr[i].shift()!],
+      [],
+    )
+    map[i] = [...firstRow, ...firstElements]
+  }
+  return map
 }
 
 function getMinorIndexCrossingThrough(
@@ -145,6 +208,19 @@ export async function getAxes(
   }
 
   return axes
+}
+
+function bifilter<T>(
+  xs: T[],
+  f: (value: T, index: number, array: T[]) => boolean,
+): [T[], T[]] {
+  return xs.reduce<[T[], T[]]>(([T, F], x, i, arr) => {
+    if (f(x, i, arr) === false) {
+      return [T, [...F, x]]
+    } else {
+      return [[...T, x], F]
+    }
+  }, [[], []])
 }
 
 export async function getWordSearchSize(file: Deno.FsFile) {
