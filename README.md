@@ -3,3 +3,4 @@
 ### Assumptions
 
 - Can't preprocess the data files manually - load them exactly as given
+- Can't use AI at all
